@@ -1,6 +1,29 @@
 #include <Novice.h>
+#include "Vector.h"
+#include <cstdint>
+#include <cmath>
+#include "Grid.h"
+#include "Sphere.h"
+#include "Segment.h"
+#include "Triangle.h"
+#include "DarwBox.h"
+#include "OBB.h"
+#include "Lerp.h"
+#ifdef _DEBUG
+#include <imgui.h>
+#endif
+#include "Collision.h"
+#include <algorithm> // std::max, std::min 用
 
-const char kWindowTitle[] = "学籍番号";
+const char kWindowTitle[] = "LE2B_29_ヤマトユウヤ_タイトル";
+static const int kRowHeight = 20;
+static const int kColumnWidth = 60;
+
+struct Spherical { 
+	Vector3 postion;
+	float radius;
+
+};
 
 // Windowsアプリでのエントリーポイント(main関数)
 int WINAPI WinMain(_In_ HINSTANCE, _In_opt_ HINSTANCE, _In_ LPSTR, _In_ int) {
@@ -9,8 +32,12 @@ int WINAPI WinMain(_In_ HINSTANCE, _In_opt_ HINSTANCE, _In_ LPSTR, _In_ int) {
 	Novice::Initialize(kWindowTitle, 1280, 720);
 
 	// キー入力結果を受け取る箱
-	char keys[256] = {0};
-	char preKeys[256] = {0};
+	char keys[256] = { 0 };
+	char preKeys[256] = { 0 };
+
+
+
+
 
 	// ウィンドウの×ボタンが押されるまでループ
 	while (Novice::ProcessMessage() == 0) {
@@ -25,17 +52,23 @@ int WINAPI WinMain(_In_ HINSTANCE, _In_opt_ HINSTANCE, _In_ LPSTR, _In_ int) {
 		/// ↓更新処理ここから
 		///
 
+
+
+
+
 		///
 		/// ↑更新処理ここまで
 		///
+
+
 
 		///
 		/// ↓描画処理ここから
 		///
 
-		///
+		///----------------
 		/// ↑描画処理ここまで
-		///
+		///----------------
 
 		// フレームの終了
 		Novice::EndFrame();

@@ -14,11 +14,46 @@
     <Filter Include="KamataEngine\Adapter">
       <UniqueIdentifier>{c6468eb4-788b-4a83-b207-a5f4804e56c5}</UniqueIdentifier>
     </Filter>
+    <Filter Include="各種ファイル">
+      <UniqueIdentifier>{b488548a-bc06-4899-a917-7705623891b2}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="main.cpp" />
     <ClCompile Include="C:\KamataEngine\Adapter\Novice.cpp">
       <Filter>KamataEngine\Adapter</Filter>
+    </ClCompile>
+    <ClCompile Include="main.cpp">
+      <Filter>各種ファイル</Filter>
+    </ClCompile>
+    <ClCompile Include="Collision.cpp">
+      <Filter>各種ファイル</Filter>
+    </ClCompile>
+    <ClCompile Include="DarwBox.cpp">
+      <Filter>各種ファイル</Filter>
+    </ClCompile>
+    <ClCompile Include="Grid.cpp">
+      <Filter>各種ファイル</Filter>
+    </ClCompile>
+    <ClCompile Include="Lerp.cpp">
+      <Filter>各種ファイル</Filter>
+    </ClCompile>
+    <ClCompile Include="OBB.cpp">
+      <Filter>各種ファイル</Filter>
+    </ClCompile>
+    <ClCompile Include="plane.cpp">
+      <Filter>各種ファイル</Filter>
+    </ClCompile>
+    <ClCompile Include="Segment.cpp">
+      <Filter>各種ファイル</Filter>
+    </ClCompile>
+    <ClCompile Include="Sphere.cpp">
+      <Filter>各種ファイル</Filter>
+    </ClCompile>
+    <ClCompile Include="Triangle.cpp">
+      <Filter>各種ファイル</Filter>
+    </ClCompile>
+    <ClCompile Include="Vector.cpp">
+      <Filter>各種ファイル</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -102,6 +137,39 @@
     </ClInclude>
     <ClInclude Include="C:\KamataEngine\DirectXGame\2d\ImGuiManager.h">
       <Filter>KamataEngine\Include</Filter>
+    </ClInclude>
+    <ClInclude Include="Capsule.h">
+      <Filter>各種ファイル</Filter>
+    </ClInclude>
+    <ClInclude Include="Collision.h">
+      <Filter>各種ファイル</Filter>
+    </ClInclude>
+    <ClInclude Include="DarwBox.h">
+      <Filter>各種ファイル</Filter>
+    </ClInclude>
+    <ClInclude Include="Grid.h">
+      <Filter>各種ファイル</Filter>
+    </ClInclude>
+    <ClInclude Include="Lerp.h">
+      <Filter>各種ファイル</Filter>
+    </ClInclude>
+    <ClInclude Include="OBB.h">
+      <Filter>各種ファイル</Filter>
+    </ClInclude>
+    <ClInclude Include="plane.h">
+      <Filter>各種ファイル</Filter>
+    </ClInclude>
+    <ClInclude Include="Segment.h">
+      <Filter>各種ファイル</Filter>
+    </ClInclude>
+    <ClInclude Include="Sphere.h">
+      <Filter>各種ファイル</Filter>
+    </ClInclude>
+    <ClInclude Include="Triangle.h">
+      <Filter>各種ファイル</Filter>
+    </ClInclude>
+    <ClInclude Include="Vector.h">
+      <Filter>各種ファイル</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>
