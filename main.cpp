@@ -21,7 +21,6 @@ static const int kRowHeight = 20;
 static const int kColumnWidth = 60;
 
 struct Spherical {
-	Vector3 postion;
 	float radius;
 	float theta;
 	float phi;
@@ -63,7 +62,7 @@ int WINAPI WinMain(_In_ HINSTANCE, _In_opt_ HINSTANCE, _In_ LPSTR, _In_ int) {
 	char preKeys[256] = {0};
 
 
-	Vector3 target{0, 0, 0};
+	Vector3 target{ 1, 1, 1};
 
 	Vector3 worldUP{0.0f, 1.0f, 0.0f};
 
@@ -89,7 +88,7 @@ int WINAPI WinMain(_In_ HINSTANCE, _In_opt_ HINSTANCE, _In_ LPSTR, _In_ int) {
 		Vector3 pos = ToCartesian(s);
 
 		Vector3 eye = target + pos;
-		Vector3 forWard = Normalize(target);
+		Vector3 forWard = Normalize(SubtractVector3(target, eye));
 		Vector3 right = Normalize(Cross(worldUP, forWard));
 		Vector3 up = Cross(forWard, right);
 
@@ -98,7 +97,7 @@ int WINAPI WinMain(_In_ HINSTANCE, _In_opt_ HINSTANCE, _In_ LPSTR, _In_ int) {
 				{right.x, right.y, right.z, 0.0f},
 			{up.x, up.y, up.z, 0.0f},
 			{forWard.x, forWard.y, forWard.z, 0.0f},
-			{eye.x, eye.y, eye.z, 0.0f}
+			{eye.x, eye.y, eye.z, 1.0f}
 			}
 		};
 
