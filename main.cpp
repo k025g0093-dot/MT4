@@ -15,14 +15,16 @@
 #include "Collision.h"
 #include <algorithm> // std::max, std::min 用
 
+#include <chrono>
+
 const char kWindowTitle[] = "LE2B_29_ヤマトユウヤ_タイトル";
 static const int kRowHeight = 20;
 static const int kColumnWidth = 60;
 
-struct Spherical { 
-	Vector3 postion;
-	float radius;
-
+struct Ellipse {
+	Vector2 pos;
+	float height;
+	float width;
 };
 
 // Windowsアプリでのエントリーポイント(main関数)
@@ -37,10 +39,18 @@ int WINAPI WinMain(_In_ HINSTANCE, _In_opt_ HINSTANCE, _In_ LPSTR, _In_ int) {
 
 
 
+	auto prevTime = std::chrono::steady_clock::now();
+
+	Vector2 mousePos = {};
 
 
 	// ウィンドウの×ボタンが押されるまでループ
 	while (Novice::ProcessMessage() == 0) {
+		
+		auto now = std::chrono::steady_clock::now();
+		std::chrono::duration<float> elapsed = now - prevTime;
+		float deltaTime = elapsed.count();
+		
 		// フレームの開始
 		Novice::BeginFrame();
 
@@ -61,7 +71,6 @@ int WINAPI WinMain(_In_ HINSTANCE, _In_opt_ HINSTANCE, _In_ LPSTR, _In_ int) {
 		///
 
 
-
 		///
 		/// ↓描画処理ここから
 		///
@@ -72,6 +81,8 @@ int WINAPI WinMain(_In_ HINSTANCE, _In_opt_ HINSTANCE, _In_ LPSTR, _In_ int) {
 
 		// フレームの終了
 		Novice::EndFrame();
+
+		prevTime = now;
 
 		// ESCキーが押されたらループを抜ける
 		if (preKeys[DIK_ESCAPE] == 0 && keys[DIK_ESCAPE] != 0) {

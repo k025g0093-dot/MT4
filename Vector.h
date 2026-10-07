@@ -1,4 +1,4 @@
-﻿#pragma once
+#pragma once
 
 struct Matrix4x4
 {
@@ -7,6 +7,9 @@ struct Matrix4x4
 
 struct Vector3 {
 	float x, y, z;
+};
+struct Vector2 {
+	float x, y;
 };
 
 Matrix4x4 Add(const Matrix4x4& m1, const Matrix4x4& m2);
