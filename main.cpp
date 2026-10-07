@@ -82,8 +82,13 @@ int WINAPI WinMain(_In_ HINSTANCE, _In_opt_ HINSTANCE, _In_ LPSTR, _In_ int) {
 #ifdef _DEBUG
 
 		ImGui::Begin("Interpolation");
-		//ImGui::SliderFloat()
-
+		ImGui::SliderFloat("speed", &speed, 0.1f, 30.0f);
+		ImGui::Text("MousePos:(%f,%f)", (float)mousePosX, (float)mousePosY);
+		ImGui::Text("spher1Pos:(%f,%f)", spher1.pos.x, spher1.pos.y);
+		ImGui::Text("spher2Pos:(%f,%f)", spher2.pos.x, spher2.pos.y);
+		ImGui::Text("now:(%f)", now);
+		ImGui::Text("deltaTime:(%f)", deltaTime);
+		ImGui::End();
 
 #endif // _DEBUG
 
