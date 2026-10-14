@@ -22,9 +22,6 @@
     <ClCompile Include="C:\KamataEngine\Adapter\Novice.cpp">
       <Filter>KamataEngine\Adapter</Filter>
     </ClCompile>
-    <ClCompile Include="main.cpp">
-      <Filter>各種ファイル</Filter>
-    </ClCompile>
     <ClCompile Include="Collision.cpp">
       <Filter>各種ファイル</Filter>
     </ClCompile>
@@ -54,6 +51,9 @@
     </ClCompile>
     <ClCompile Include="Vector.cpp">
       <Filter>各種ファイル</Filter>
+    </ClCompile>
+    <ClCompile Include="main.cpp">
+      <Filter>KamataEngine</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

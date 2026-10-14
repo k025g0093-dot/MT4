@@ -21,11 +21,94 @@ const char kWindowTitle[] = "LE2B_29_ヤマトユウヤ_タイトル";
 static const int kRowHeight = 20;
 static const int kColumnWidth = 60;
 
-struct Spher {
-	Vector2 pos;
-	float radius;
-
+struct Quaternion {
+	float x;
+	float y;
+	float z;
+	float w;
 };
+
+//Quaternionの積
+Quaternion Multiply(const Quaternion& lhs, const Quaternion& rhs) {
+
+	Quaternion pr{};
+
+	pr.w = lhs.w * rhs.w - lhs.x * rhs.x - lhs.y * rhs.y - lhs.z * rhs.z;
+	pr.x = lhs.y * rhs.z - lhs.z * rhs.y  +rhs.w * lhs.x + lhs.w * rhs.x;
+	pr.y = lhs.z * rhs.x - lhs.x * rhs.z + rhs.w * lhs.y + lhs.w * rhs.y;
+	pr.z = lhs.x * rhs.y - lhs.y * rhs.x + rhs.w * lhs.z + lhs.w * rhs.z;
+
+	return pr;
+}
+
+//乗法単位元を返す　
+Quaternion IdentityQuaternion() {
+	Quaternion pr{0,0,0,1};
+	return pr;
+}
+
+//共役のQuaternionを返す
+Quaternion Conjugate(const Quaternion& quaternion) {
+
+	Quaternion pr{};
+	pr.w = quaternion.w;
+	pr.x = -quaternion.x;
+	pr.y = -quaternion.y;
+	pr.z = -quaternion.z;
+	return pr;
+}
+
+//Quaternionのnormを返す
+float Norm(const Quaternion& quaternion) {
+
+	float pr{};
+	pr = std::sqrt(
+		quaternion.w * quaternion.w + 
+		quaternion.x * quaternion.x + 
+		quaternion.y * quaternion.y + 
+		quaternion.z * quaternion.z 
+		);
+	return pr;
+}
+
+float NormSquared(const Quaternion& quaternion) {
+
+	float pr{};
+	pr = (
+		quaternion.w * quaternion.w + 
+		quaternion.x * quaternion.x + 
+		quaternion.y * quaternion.y + 
+		quaternion.z * quaternion.z 
+		);
+	return pr;
+}
+
+//正規化したQuaternionを返す
+Quaternion Normalize(const Quaternion& quaternion) {
+
+	Quaternion pr{};
+	float norm = Norm(quaternion);
+	pr.w = quaternion.w / norm;
+	pr.x = quaternion.x / norm;
+	pr.y = quaternion.y / norm;
+	pr.z = quaternion.z / norm;
+	return pr;
+}
+
+//逆Quaternionを返す関数
+Quaternion Inverse(const Quaternion& quaternion) {
+
+	Quaternion pr{};
+	float norm = NormSquared(quaternion);
+	Quaternion quat = Conjugate(quaternion);
+
+	pr.w = quat.w / norm;
+	pr.x= quat.x / norm;
+	pr.y = quat.y / norm;
+	pr.z = quat.z / norm;
+
+	return pr;
+}
 
 // Windowsアプリでのエントリーポイント(main関数)
 int WINAPI WinMain(_In_ HINSTANCE, _In_opt_ HINSTANCE, _In_ LPSTR, _In_ int) {
@@ -37,29 +120,11 @@ int WINAPI WinMain(_In_ HINSTANCE, _In_opt_ HINSTANCE, _In_ LPSTR, _In_ int) {
 	char keys[256] = {0};
 	char preKeys[256] = {0};
 
-	Spher spher1 = {
-	    {0, 0},
-        12
-    };
-	Spher spher2 = {
-	    {640, 360},
-        20
-    };
-
-	float speed = 3.0f;
-
-	auto prevTime = std::chrono::steady_clock::now();
-
-	int mousePosX, mousePosY = {};
+	Quaternion q1{2.0f, 3.0f, 4.0f, 1.0f};
+	Quaternion q2{1.0f, 3.0f, 5.0f, 2.0f};
 
 	// ウィンドウの×ボタンが押されるまでループ
 	while (Novice::ProcessMessage() == 0) {
-
-		auto now = std::chrono::steady_clock::now();
-		std::chrono::duration<float> elapsed = now - prevTime;
-		float deltaTime = elapsed.count();
-
-		deltaTime = 1.0f / 60.0f;
 
 		// フレームの開始
 		Novice::BeginFrame();
@@ -72,27 +137,15 @@ int WINAPI WinMain(_In_ HINSTANCE, _In_opt_ HINSTANCE, _In_ LPSTR, _In_ int) {
 		/// ↓更新処理ここから
 		///
 
-		Novice::GetMousePosition(&mousePosX, &mousePosY);
+		Quaternion identity = IdentityQuaternion();
+		Quaternion conj = Conjugate(q1);
+		Quaternion inv = Inverse(q1);
+		Quaternion normal = Normalize(q1);
+		Quaternion mul1 = Multiply(q1, q2);
+		Quaternion mul2 = Multiply(q2, q1);
+		float norm = Norm(q1);
 
-		spher1.pos = {(float)mousePosX, (float)mousePosY};
-
-		spher2.pos.x += (speed * deltaTime) * (spher1.pos.x - spher2.pos.x);
-		spher2.pos.y += (speed * deltaTime) * (spher1.pos.y - spher2.pos.y);
-
-#ifdef _DEBUG
-
-		ImGui::Begin("Interpolation");
-		ImGui::SliderFloat("speed", &speed, 0.1f, 30.0f);
-		ImGui::Text("MousePos:(%f,%f)", (float)mousePosX, (float)mousePosY);
-		ImGui::Text("spher1Pos:(%f,%f)", spher1.pos.x, spher1.pos.y);
-		ImGui::Text("spher2Pos:(%f,%f)", spher2.pos.x, spher2.pos.y);
-		ImGui::Text("now:(%f)", now);
-		ImGui::Text("deltaTime:(%f)", deltaTime);
-		ImGui::End();
-
-#endif // _DEBUG
-
-
+		
 		///
 		/// ↑更新処理ここまで
 		///
@@ -101,9 +154,24 @@ int WINAPI WinMain(_In_ HINSTANCE, _In_opt_ HINSTANCE, _In_ LPSTR, _In_ int) {
 		/// ↓描画処理ここから
 		///
 
-		Novice::DrawEllipse((int)spher1.pos.x, (int)spher1.pos.y, (int)spher1.radius, (int)spher1.radius, 0.0f, 0xFF0000FF, kFillModeSolid);
-		Novice::DrawLine((int)spher1.pos.x, (int)spher1.pos.y, (int)spher2.pos.x, (int)spher2.pos.y, 0xFF0000FF);
-		Novice::DrawEllipse((int)spher2.pos.x, (int)spher2.pos.y, (int)spher2.radius, (int)spher2.radius, 0.0f, 0x00FF00FF, kFillModeSolid);
+		auto printQuaternion = [](int row, const Quaternion& q, const char* label) {
+			int y = row * kRowHeight;
+			Novice::ScreenPrintf(kColumnWidth * 0, y, "%6.02f", q.x);
+			Novice::ScreenPrintf(kColumnWidth * 1, y, "%6.02f", q.y);
+			Novice::ScreenPrintf(kColumnWidth * 2, y, "%6.02f", q.z);
+			Novice::ScreenPrintf(kColumnWidth * 3, y, "%6.02f", q.w);
+			Novice::ScreenPrintf(kColumnWidth * 4, y, ": %s", label);
+		};
+
+		printQuaternion(0, identity, "Identity");
+		printQuaternion(1, conj, "Conjugate");
+		printQuaternion(2, inv, "Inverse");
+		printQuaternion(3, normal, "Normalize");
+		printQuaternion(4, mul1, "Multiply(q1, q2)");
+		printQuaternion(5, mul2, "Multiply(q2, q1)");
+
+		Novice::ScreenPrintf(kColumnWidth * 0, 6 * kRowHeight, "%6.02f", norm);
+		Novice::ScreenPrintf(kColumnWidth * 4, 6 * kRowHeight, ": Norm");
 
 		///----------------
 		/// ↑描画処理ここまで
@@ -111,8 +179,6 @@ int WINAPI WinMain(_In_ HINSTANCE, _In_opt_ HINSTANCE, _In_ LPSTR, _In_ int) {
 
 		// フレームの終了
 		Novice::EndFrame();
-
-		prevTime = now;
 
 		// ESCキーが押されたらループを抜ける
 		if (preKeys[DIK_ESCAPE] == 0 && keys[DIK_ESCAPE] != 0) {
