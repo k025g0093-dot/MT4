@@ -234,6 +234,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClInclude Include="Lerp.h" />
     <ClInclude Include="OBB.h" />
     <ClInclude Include="plane.h" />
+    <ClInclude Include="Quaternion.h" />
     <ClInclude Include="Segment.h" />
     <ClInclude Include="Sphere.h" />
     <ClInclude Include="Triangle.h" />

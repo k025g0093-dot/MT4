@@ -17,6 +17,9 @@
     <Filter Include="各種ファイル">
       <UniqueIdentifier>{b488548a-bc06-4899-a917-7705623891b2}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Quaternion">
+      <UniqueIdentifier>{9f51a08e-6585-4a92-87dc-eee3e6ee8c57}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="C:\KamataEngine\Adapter\Novice.cpp">
@@ -170,6 +173,9 @@
     </ClInclude>
     <ClInclude Include="Vector.h">
       <Filter>各種ファイル</Filter>
+    </ClInclude>
+    <ClInclude Include="Quaternion.h">
+      <Filter>Quaternion</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>
