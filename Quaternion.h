@@ -1,6 +1,7 @@
 #pragma once
 #include <algorithm>
 #include <iostream>
+#include <numbers>
 
 struct Quaternion {
 	float x;
@@ -88,19 +89,17 @@ Quaternion MakeRotateAxisAngleQuaternion(const Vector3& axis, const float angle)
 	q.w = std::cos(angle / 2);
 	q.x = std::sin(angle / 2) * axis.x;
 	q.y = std::sin(angle / 2) * axis.y;
-	q.z =  std::sin(angle / 2) * axis.z;
+	q.z = std::sin(angle / 2) * axis.z;
 
 	return q;
 }
 
-Vector3 RotateVector(
-	const Vector3& vector, 
-	const Quaternion& quaternion) {
+Vector3 RotateVector(const Vector3& vector, const Quaternion& quaternion) {
 
 	Vector3 q{};
 
-	Quaternion qm = {vector.x, vector.y, vector.z,0};
-	Quaternion quat = Multiply(quaternion, Multiply(qm,Conjugate(quaternion)));
+	Quaternion qm = {vector.x, vector.y, vector.z, 0};
+	Quaternion quat = Multiply(quaternion, Multiply(qm, Conjugate(quaternion)));
 
 	q.x = quat.x;
 	q.y = quat.y;
@@ -134,4 +133,28 @@ Matrix4x4 MakeRotateMatrix(const Quaternion& quaternion) {
 	mRotate.m[3][3] = 1;
 
 	return mRotate;
+}
+
+Quaternion DirectionToDirectuin(const Vector3& from, const Vector3& to) {
+
+	float dot = Dot(Normalize(from), Normalize(to));
+	Vector3 cross = Cross(Normalize(from), Normalize(to));
+	Quaternion rotation{cross.x, cross.y, cross.z, 1.0f + dot};
+
+	const float tolerance = 1.0e-6f;
+
+	if (dot <= -1.0f + tolerance) {
+
+		constexpr float kParallelThreshold = 1.0e-3f;
+
+		Vector3 axis = Vector3{from.y, -from.x, 0.0f};
+
+		if (Length(axis) < kParallelThreshold) {
+			axis = Vector3{from.z, 0.0f, -from.x};
+		}
+		axis = Normalize(axis);
+		return Quaternion{axis.x, axis.y, axis.z, 0.0f};
+
+	}
+	return Normalize(rotation);
 }

@@ -15,14 +15,17 @@ static const int kRowHeight = 20;
 static const int kColumnWidth = 60;
 
 
-Quaternion rotation = MakeRotateAxisAngleQuaternion(
-	Normalize(Vector3{1.0f, 0.4f, -0.2f}), 0.45f
-);
+Vector3 from0 = Normalize(Vector3{1.0f, 0.7f, 0.5f});
+Vector3 to0 = -from0;
+Vector3 from1 = Normalize(Vector3{-0.6f, 0.9f, 0.2f});
+Vector3 to1 = Normalize(Vector3{0.4f, 0.7f, -0.5f});
 
-Vector3 pointY = {2.1f, -0.9f, 1.3f};
-Matrix4x4 rotateMatrix = MakeRotateMatrix(rotation);
-Vector3 rotateByQuaternion = RotateVector(pointY, rotation);
-Vector3 rotateByMatrix = Transform(pointY, rotateMatrix);
+// 四元数を求める
+Matrix4x4 rotateMatrix0 = MakeRotateMatrix(DirectionToDirectuin(
+	Normalize(Vector3{1.0f, 0.0f, 0.0f}),
+	Normalize(Vector3{-1.0f, 0.0f, 0.0f})));
+Matrix4x4 rotateMatrix1 = MakeRotateMatrix(DirectionToDirectuin(from0, to0));
+Matrix4x4 rotateMatrix2 = MakeRotateMatrix(DirectionToDirectuin(from1, to1));
 
 // Windowsアプリでのエントリーポイント(main関数)
 int WINAPI WinMain(_In_ HINSTANCE, _In_opt_ HINSTANCE, _In_ LPSTR, _In_ int) {
@@ -71,14 +74,6 @@ int WINAPI WinMain(_In_ HINSTANCE, _In_opt_ HINSTANCE, _In_ LPSTR, _In_ int) {
 			Novice::ScreenPrintf(kColumnWidth * 4, y, ": %s", label);
 		};
 
-		// x, y, z を1行に並べ、最後に名前を表示する
-		auto printVector = [](int row, const Vector3& v, const char* label) {
-			int y = row * kRowHeight;
-			Novice::ScreenPrintf(kColumnWidth * 0, y, "%6.02f", v.x);
-			Novice::ScreenPrintf(kColumnWidth * 1, y, "%6.02f", v.y);
-			Novice::ScreenPrintf(kColumnWidth * 2, y, "%6.02f", v.z);
-			Novice::ScreenPrintf(kColumnWidth * 4, y, ": %s", label);
-		};
 
 		// 名前を1行表示し、その下に4x4を並べる
 		auto printMatrix = [](int row, const Matrix4x4& m, const char* label) {
@@ -90,10 +85,11 @@ int WINAPI WinMain(_In_ HINSTANCE, _In_opt_ HINSTANCE, _In_ LPSTR, _In_ int) {
 			}
 		};
 
-		printQuaternion(0, rotation, "rotation");
-		printVector(1, rotateByQuaternion, "rotateByQuaternion");
-		printVector(2, rotateByMatrix, "rotateByMatrix");
-		printMatrix(4, rotateMatrix, "rotateMatrix");
+		printMatrix(0, rotateMatrix0, "rotateMatrix0");
+		printMatrix(5, rotateMatrix1, "rotateMatrix1");
+		printMatrix(10, rotateMatrix2, "rotateMatrix2");
+
+
 
 		///----------------
 		/// ↑描画処理ここまで

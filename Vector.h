@@ -54,6 +54,7 @@ inline Vector3 operator-(const Vector3& v1, const Vector3& v2){return SubtractVe
 inline Vector3 operator*(const float s, const Vector3& v){return MultiplyVector3(s, v); }
 inline Vector3 operator*(const Vector3& v, const float s){return MultiplyVector3(s, v); }
 inline Vector3 operator/(const Vector3& v, const float s) { return MultiplyVector3(1.0f / s, v); }
+inline Vector3 operator-(const Vector3& v) { return MultiplyVector3(-1.0f, v); }
 
 inline Matrix4x4 operator+(const Matrix4x4& m1, const Matrix4x4& m2) { return Add(m1, m2); }
 inline Matrix4x4 operator-(const Matrix4x4& m1, const Matrix4x4& m2) { return Subtract(m1, m2); }
