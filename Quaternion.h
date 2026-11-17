@@ -158,3 +158,39 @@ Quaternion DirectionToDirectuin(const Vector3& from, const Vector3& to) {
 	}
 	return Normalize(rotation);
 }
+
+// 球面線形補間
+Quaternion Slerp(const Quaternion& q0, const Quaternion& q1, float t) {
+
+	float dot = q0.x * q1.x + q0.y * q1.y + q0.z * q1.z + q0.w * q1.w;
+
+	Quaternion start = q0;
+	if (dot < 0.0f) {
+		start = Quaternion{-q0.x, -q0.y, -q0.z, -q0.w};
+		dot = -dot;
+	}
+
+	dot = (std::min)(dot, 1.0f);
+
+	float theta = std::acos(dot);
+	float sin_theta = std::sin(theta);
+
+	float scale0 = 0.0f;
+	float scale1 = 0.0f;
+
+	constexpr float kEpsilon = 1.0e-5f;
+	if (sin_theta < kEpsilon) {
+		scale0 = 1.0f - t;
+		scale1 = t;
+	} else {
+		scale0 = std::sin((1.0f - t) * theta) / sin_theta;
+		scale1 = std::sin(t * theta) / sin_theta;
+	}
+
+	return Quaternion{
+	    scale0 * start.x + scale1 * q1.x,
+	    scale0 * start.y + scale1 * q1.y,
+	    scale0 * start.z + scale1 * q1.z,
+	    scale0 * start.w + scale1 * q1.w,
+	};
+}

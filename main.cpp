@@ -15,18 +15,14 @@ static const int kRowHeight = 20;
 static const int kColumnWidth = 60;
 
 
-Vector3 from0 = Normalize(Vector3{1.0f, 0.7f, 0.5f});
-Vector3 to0 = -from0;
-Vector3 from1 = Normalize(Vector3{-0.6f, 0.9f, 0.2f});
-Vector3 to1 = Normalize(Vector3{0.4f, 0.7f, -0.5f});
+Quaternion rotation0 = MakeRotateAxisAngleQuaternion({0.71f, 0.71f, 0.0f}, 0.3f);
+Quaternion rotation1 = MakeRotateAxisAngleQuaternion({0.71f, 0.0f, 0.71f}, 3.141592f);
 
-// 四元数を求める
-Matrix4x4 rotateMatrix0 = MakeRotateMatrix(DirectionToDirectuin(
-	Normalize(Vector3{1.0f, 0.0f, 0.0f}),
-	Normalize(Vector3{-1.0f, 0.0f, 0.0f})));
-Matrix4x4 rotateMatrix1 = MakeRotateMatrix(DirectionToDirectuin(from0, to0));
-Matrix4x4 rotateMatrix2 = MakeRotateMatrix(DirectionToDirectuin(from1, to1));
-
+Quaternion interpolate0 = Slerp(rotation0, rotation1, 0.0f);
+Quaternion interpolate1 = Slerp(rotation0, rotation1, 0.3f);
+Quaternion interpolate2 = Slerp(rotation0, rotation1, 0.5f);
+Quaternion interpolate3 = Slerp(rotation0, rotation1, 0.7f);
+Quaternion interpolate4 = Slerp(rotation0, rotation1, 1.0f);
 // Windowsアプリでのエントリーポイント(main関数)
 int WINAPI WinMain(_In_ HINSTANCE, _In_opt_ HINSTANCE, _In_ LPSTR, _In_ int) {
 
@@ -85,9 +81,11 @@ int WINAPI WinMain(_In_ HINSTANCE, _In_opt_ HINSTANCE, _In_ LPSTR, _In_ int) {
 			}
 		};
 
-		printMatrix(0, rotateMatrix0, "rotateMatrix0");
-		printMatrix(5, rotateMatrix1, "rotateMatrix1");
-		printMatrix(10, rotateMatrix2, "rotateMatrix2");
+		printQuaternion(0, interpolate0, "interpolate0, Slerp(q0, q1, 0.0f)");
+		printQuaternion(1, interpolate1, "interpolate1, Slerp(q0, q1, 0.3f)");
+		printQuaternion(2, interpolate2, "interpolate2, Slerp(q0, q1, 0.5f)");
+		printQuaternion(3, interpolate3, "interpolate3, Slerp(q0, q1, 0.7f)");
+		printQuaternion(4, interpolate4, "interpolate4, Slerp(q0, q1, 1.0f)");
 
 
 
