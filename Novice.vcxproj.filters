@@ -20,6 +20,9 @@
     <Filter Include="Quaternion">
       <UniqueIdentifier>{9f51a08e-6585-4a92-87dc-eee3e6ee8c57}</UniqueIdentifier>
     </Filter>
+    <Filter Include="NewFilter1">
+      <UniqueIdentifier>{6aca7220-866a-4d93-94c0-aefbcb83ea57}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="C:\KamataEngine\Adapter\Novice.cpp">

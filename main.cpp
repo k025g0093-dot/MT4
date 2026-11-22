@@ -6,26 +6,39 @@
 #include <imgui.h>
 #endif
 #include "Collision.h"
+#include "Quaternion.h"
 #include <algorithm> // std::max, std::min 用
 #include <chrono>
-#include "Quaternion.h"
 
 const char kWindowTitle[] = "LE2B_29_ヤマトユウヤ_タイトル";
-static const int kRowHeight = 20;
-static const int kColumnWidth = 60;
 
+/*台の形*/
+float f(float x) { return 0.125f * x * x * x + 0.25f * x * x; }
+/*導関数*/
+float fPraime(float x) { return 0.75f * x * x + 0.0f; }
 
-Vector3 from0 = Normalize(Vector3{1.0f, 0.7f, 0.5f});
-Vector3 to0 = -from0;
-Vector3 from1 = Normalize(Vector3{-0.6f, 0.9f, 0.2f});
-Vector3 to1 = Normalize(Vector3{0.4f, 0.7f, -0.5f});
+Vector2 Normalized(const Vector2& v) {
+	float length = std::sqrtf(v.x * v.x + v.y * v.y);
+	return {v.x / length, v.y / length};
+}
 
-// 四元数を求める
-Matrix4x4 rotateMatrix0 = MakeRotateMatrix(DirectionToDirectuin(
-	Normalize(Vector3{1.0f, 0.0f, 0.0f}),
-	Normalize(Vector3{-1.0f, 0.0f, 0.0f})));
-Matrix4x4 rotateMatrix1 = MakeRotateMatrix(DirectionToDirectuin(from0, to0));
-Matrix4x4 rotateMatrix2 = MakeRotateMatrix(DirectionToDirectuin(from1, to1));
+float x = 0.0f;
+
+// ステージに使う横線
+struct Lines {
+	Vector2 pos;
+	Vector2 world;
+};
+
+struct Front {
+	Vector2 pos;
+	Vector2 world;
+};
+
+struct Back {
+	Vector2 pos;
+	Vector2 world;
+};
 
 // Windowsアプリでのエントリーポイント(main関数)
 int WINAPI WinMain(_In_ HINSTANCE, _In_opt_ HINSTANCE, _In_ LPSTR, _In_ int) {
@@ -37,7 +50,32 @@ int WINAPI WinMain(_In_ HINSTANCE, _In_opt_ HINSTANCE, _In_ LPSTR, _In_ int) {
 	char keys[256] = {0};
 	char preKeys[256] = {0};
 
+	Front front{};
+	front.world.x = 0.0f;
+	front.world.y = 0.0f;
+	front.pos.x = front.world.x;
+	front.pos.y = front.world.y;
 
+	Back back{};
+	back.world.x = 0.0f;
+	back.world.y = 0.0f;
+	back.pos.x = back.world.x;
+	back.pos.y = back.world.y;
+
+	Vector2 kBodyHalfLenght = {0.15f, 0.15f};
+
+	/*地面の線*/
+	Lines lineB{};
+	lineB.world.x = 0.0f;
+	lineB.world.y = 0.0f;
+	lineB.pos.x = lineB.world.x;
+	lineB.pos.y = lineB.world.y;
+
+	Lines lineA{};
+	lineA.world.x = 0.0f;
+	lineA.world.y = 0.0f;
+	lineA.pos.x = lineA.world.x;
+	lineA.pos.y = lineA.world.y;
 
 	// ウィンドウの×ボタンが押されるまでループ
 	while (Novice::ProcessMessage() == 0) {
@@ -53,9 +91,35 @@ int WINAPI WinMain(_In_ HINSTANCE, _In_opt_ HINSTANCE, _In_ LPSTR, _In_ int) {
 		/// ↓更新処理ここから
 		///
 
+		Vector2 position{x, f(x)};
+		float slope = fPraime(x);
+		Vector2 forward = NormalizeToVector2(1.0f, slope);
 
+		forward = Normalized({1.0f, slope});
+		back.world.x = position.x - forward.x * kBodyHalfLenght.x;
+		back.world.y = position.y - forward.y * kBodyHalfLenght.y;
 
-		
+		front.world.x = position.x + forward.x * kBodyHalfLenght.x;
+		front.world.y = position.y + forward.y * kBodyHalfLenght.y;
+
+		if (preKeys[DIK_A]) {
+			if (x <= 0) {
+				x = 0.0f;
+			}
+			x -= 0.0167f;
+		}
+		if (preKeys[DIK_D]) {
+			if (x >= 2) {
+				x = 2.0f;
+			}
+			x += 0.0167f;
+		}
+
+		ImGui::Begin("jump Ramp");
+		ImGui::DragFloat("x:%d", &x);
+
+		ImGui::End();
+
 		///
 		/// ↑更新処理ここまで
 		///
@@ -64,32 +128,39 @@ int WINAPI WinMain(_In_ HINSTANCE, _In_opt_ HINSTANCE, _In_ LPSTR, _In_ int) {
 		/// ↓描画処理ここから
 		///
 
-				// x, y, z, w を1行に並べ、最後に名前を表示する
-		auto printQuaternion = [](int row, const Quaternion& q, const char* label) {
-			int y = row * kRowHeight;
-			Novice::ScreenPrintf(kColumnWidth * 0, y, "%6.02f", q.x);
-			Novice::ScreenPrintf(kColumnWidth * 1, y, "%6.02f", q.y);
-			Novice::ScreenPrintf(kColumnWidth * 2, y, "%6.02f", q.z);
-			Novice::ScreenPrintf(kColumnWidth * 3, y, "%6.02f", q.w);
-			Novice::ScreenPrintf(kColumnWidth * 4, y, ": %s", label);
-		};
+		front.pos.x = 400 + 240 * front.world.x;
+		front.pos.y = 640 - 240 * front.world.y;
+		Novice::DrawEllipse((int)front.pos.x, (int)front.pos.y, 10, 10, 0.0f, 0xFFFF00FF, kFillModeSolid);
 
+		back.pos.x = 400 + 240 * back.world.x;
+		back.pos.y = 640 - 240 * back.world.y;
+		Novice::DrawEllipse((int)back.pos.x, (int)back.pos.y, 10, 10, 0.0f, 0xFFFF00FF, kFillModeSolid);
 
-		// 名前を1行表示し、その下に4x4を並べる
-		auto printMatrix = [](int row, const Matrix4x4& m, const char* label) {
-			Novice::ScreenPrintf(0, row * kRowHeight, "%s", label);
-			for (int r = 0; r < 4; ++r) {
-				for (int c = 0; c < 4; ++c) {
-					Novice::ScreenPrintf(kColumnWidth * c, (row + 1 + r) * kRowHeight, "%6.03f", m.m[r][c]);
-				}
-			}
-		};
+		Novice::DrawLine((int)front.pos.x, (int)front.pos.y, (int)back.pos.x, (int)back.pos.y, 0xFFFF00FF);
 
-		printMatrix(0, rotateMatrix0, "rotateMatrix0");
-		printMatrix(5, rotateMatrix1, "rotateMatrix1");
-		printMatrix(10, rotateMatrix2, "rotateMatrix2");
+		lineB.pos.x = lineB.world.x;
+		lineB.pos.y = 640 - 240 * lineB.world.y;
+		Novice::DrawLine((int)lineB.pos.x, (int)(lineB.pos.y), (int)lineB.pos.x + 1280, (int)(lineB.pos.y), 0xffffffff);
 
+		for (int i = 0; i < 200; i++) {
 
+			lineA.pos.x = (float)(i * (2.0f / 200.0f));
+			lineA.pos.y = f(lineA.pos.x);
+			float nextX = (float)((i + 1) * (2.0f / 200.0f));
+			float nextY = f(nextX);
+
+			lineA.pos.x = 400 + 240 * lineA.pos.x;
+			lineA.pos.y = 640 - 240 * lineA.pos.y;
+			nextX = 400 + 240 * nextX;
+			nextY = 640 - 240 * nextY;
+
+			Novice::DrawLine(
+				(int)lineA.pos.x, 
+				(int)lineA.pos.y,
+				(int)nextX,
+				(int)nextY,
+				0xFFFFFFFF);
+		}
 
 		///----------------
 		/// ↑描画処理ここまで
