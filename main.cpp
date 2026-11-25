@@ -62,7 +62,7 @@ int WINAPI WinMain(_In_ HINSTANCE, _In_opt_ HINSTANCE, _In_ LPSTR, _In_ int) {
 	back.pos.x = back.world.x;
 	back.pos.y = back.world.y;
 
-	Vector2 kBodyHalfLenght = {0.15f, 0.15f};
+	Vector2 kBodyHalfLenght = {0.075f, 0.075f};
 
 	/*地面の線*/
 	Lines lineB{};
