@@ -12,33 +12,27 @@
 
 const char kWindowTitle[] = "LE2B_29_ヤマトユウヤ_タイトル";
 
-/*台の形*/
-float f(float x) { return 0.125f * x * x * x + 0.25f * x * x; }
-/*導関数*/
-float fPraime(float x) { return 0.75f * x * x + 0.0f; }
+Vector2 Bezier(const Vector2& p0, const Vector2& p1, const Vector2& p2, float t) {
 
-Vector2 Normalized(const Vector2& v) {
-	float length = std::sqrtf(v.x * v.x + v.y * v.y);
-	return {v.x / length, v.y / length};
+	Vector2 result{};
+	result.x = ((1 - t) * (1 - t)) * p0.x + 2 * t * (1 - t) * p1.x + (t * t) * p2.x;
+	result.y = ((1 - t) * (1 - t)) * p0.y + 2 * t * (1 - t) * p1.y + (t * t) * p2.y;
+	return result;
 }
 
-float x = 0.0f;
+Vector2 BezierDerivative(const Vector2& p0, const Vector2& p1, const Vector2& p2, float t) {
+	Vector2 result;
+	result.x = 2 * (p1.x - p0.x) + 2 * t * (p0.x - (2 * p1.x) + p2.x);
+	result.y = 2 * (p1.y - p0.y) + 2 * t * (p0.y - (2 * p1.y) + p2.y);
+	return result;
+}
 
-// ステージに使う横線
-struct Lines {
-	Vector2 pos;
-	Vector2 world;
-};
+Vector2 p0{200, 570};
+Vector2 p1{800, 70};
+Vector2 p2{1080, 570};
 
-struct Front {
-	Vector2 pos;
-	Vector2 world;
-};
 
-struct Back {
-	Vector2 pos;
-	Vector2 world;
-};
+Vector2 operator*(float s, const Vector2& v);
 
 // Windowsアプリでのエントリーポイント(main関数)
 int WINAPI WinMain(_In_ HINSTANCE, _In_opt_ HINSTANCE, _In_ LPSTR, _In_ int) {
@@ -50,32 +44,8 @@ int WINAPI WinMain(_In_ HINSTANCE, _In_opt_ HINSTANCE, _In_ LPSTR, _In_ int) {
 	char keys[256] = {0};
 	char preKeys[256] = {0};
 
-	Front front{};
-	front.world.x = 0.0f;
-	front.world.y = 0.0f;
-	front.pos.x = front.world.x;
-	front.pos.y = front.world.y;
-
-	Back back{};
-	back.world.x = 0.0f;
-	back.world.y = 0.0f;
-	back.pos.x = back.world.x;
-	back.pos.y = back.world.y;
-
-	Vector2 kBodyHalfLenght = {0.15f, 0.15f};
-
-	/*地面の線*/
-	Lines lineB{};
-	lineB.world.x = 0.0f;
-	lineB.world.y = 0.0f;
-	lineB.pos.x = lineB.world.x;
-	lineB.pos.y = lineB.world.y;
-
-	Lines lineA{};
-	lineA.world.x = 0.0f;
-	lineA.world.y = 0.0f;
-	lineA.pos.x = lineA.world.x;
-	lineA.pos.y = lineA.world.y;
+	int kRoadSegments = 200;
+	float t = 0.0f;
 
 	// ウィンドウの×ボタンが押されるまでループ
 	while (Novice::ProcessMessage() == 0) {
@@ -90,35 +60,17 @@ int WINAPI WinMain(_In_ HINSTANCE, _In_opt_ HINSTANCE, _In_ LPSTR, _In_ int) {
 		///
 		/// ↓更新処理ここから
 		///
+		Vector2 c = Bezier(p0, p1, p2, t);
+		Vector2 derivative =NormalizeToVector2 (BezierDerivative(p0, p1, p2, t).x,BezierDerivative(p0, p1, p2, t).y);
 
-		Vector2 position{x, f(x)};
-		float slope = fPraime(x);
-		Vector2 forward = NormalizeToVector2(1.0f, slope);
-
-		forward = Normalized({1.0f, slope});
-		back.world.x = position.x - forward.x * kBodyHalfLenght.x;
-		back.world.y = position.y - forward.y * kBodyHalfLenght.y;
-
-		front.world.x = position.x + forward.x * kBodyHalfLenght.x;
-		front.world.y = position.y + forward.y * kBodyHalfLenght.y;
-
-		if (preKeys[DIK_A]) {
-			if (x <= 0) {
-				x = 0.0f;
-			}
-			x -= 0.0167f;
-		}
-		if (preKeys[DIK_D]) {
-			if (x >= 2) {
-				x = 2.0f;
-			}
-			x += 0.0167f;
-		}
-
-		ImGui::Begin("jump Ramp");
-		ImGui::DragFloat("x:%d", &x);
-
+		ImGui::Begin("Bezier");
+		ImGui::SliderFloat("t", &t,0,1);
+		ImGui::SliderFloat("p1:x", &p1.x,400,800);
+		ImGui::SliderFloat("p1:y", &p1.y,20,570);
+		ImGui::Text("t:%.2f,%.2f", c.x,c.y);
+		ImGui::Text("t':%.2f,%.2f", derivative.x, derivative.y);
 		ImGui::End();
+
 
 		///
 		/// ↑更新処理ここまで
@@ -128,38 +80,29 @@ int WINAPI WinMain(_In_ HINSTANCE, _In_opt_ HINSTANCE, _In_ LPSTR, _In_ int) {
 		/// ↓描画処理ここから
 		///
 
-		front.pos.x = 400 + 240 * front.world.x;
-		front.pos.y = 640 - 240 * front.world.y;
-		Novice::DrawEllipse((int)front.pos.x, (int)front.pos.y, 10, 10, 0.0f, 0xFFFF00FF, kFillModeSolid);
 
-		back.pos.x = 400 + 240 * back.world.x;
-		back.pos.y = 640 - 240 * back.world.y;
-		Novice::DrawEllipse((int)back.pos.x, (int)back.pos.y, 10, 10, 0.0f, 0xFFFF00FF, kFillModeSolid);
+		Novice::DrawEllipse((int)c.x, (int)c.y, 10, 10, 0.0f, 0x181818FF, kFillModeSolid);
 
-		Novice::DrawLine((int)front.pos.x, (int)front.pos.y, (int)back.pos.x, (int)back.pos.y, 0xFFFF00FF);
+	
 
-		lineB.pos.x = lineB.world.x;
-		lineB.pos.y = 640 - 240 * lineB.world.y;
-		Novice::DrawLine((int)lineB.pos.x, (int)(lineB.pos.y), (int)lineB.pos.x + 1280, (int)(lineB.pos.y), 0xffffffff);
+		Novice::DrawLine(
+			(int)c.x, (int)c.y, 
+			(int)(c.x+derivative.x*120), (int)(c.y+derivative.y*120),
+			0xFF0000FF
+			);
 
-		for (int i = 0; i < 200; i++) {
-
-			lineA.pos.x = (float)(i * (2.0f / 200.0f));
-			lineA.pos.y = f(lineA.pos.x);
-			float nextX = (float)((i + 1) * (2.0f / 200.0f));
-			float nextY = f(nextX);
-
-			lineA.pos.x = 400 + 240 * lineA.pos.x;
-			lineA.pos.y = 640 - 240 * lineA.pos.y;
-			nextX = 400 + 240 * nextX;
-			nextY = 640 - 240 * nextY;
-
+		for (int i = 0; i < kRoadSegments; i++) {
+			float t0 = static_cast<float>(i) / static_cast<float>(kRoadSegments);
+			float t1 = static_cast<float>(i + 1) / static_cast<float>(kRoadSegments);
+			Vector2 c0 = Bezier(p0, p1, p2, t0);
+			Vector2 c1 = Bezier(p0, p1, p2, t1);
 			Novice::DrawLine(
-				(int)lineA.pos.x, 
-				(int)lineA.pos.y,
-				(int)nextX,
-				(int)nextY,
-				0xFFFFFFFF);
+				static_cast<int>(c0.x),
+				static_cast<int>(c0.y),
+				static_cast<int>(c1.x),
+				static_cast<int>(c1.y),
+				0xFFFFFFFF
+			);
 		}
 
 		///----------------
