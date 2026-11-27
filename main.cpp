@@ -15,7 +15,7 @@ const char kWindowTitle[] = "LE2B_29_ヤマトユウヤ_タイトル";
 /*台の形*/
 float f(float x) { return 0.125f * x * x * x + 0.25f * x * x; }
 /*導関数*/
-float fPraime(float x) { return 0.75f * x * x + 0.0f; }
+float fPraime(float x) { return 0.375f * x * x + 0.5f*x; }
 
 Vector2 Normalized(const Vector2& v) {
 	float length = std::sqrtf(v.x * v.x + v.y * v.y);
@@ -102,22 +102,23 @@ int WINAPI WinMain(_In_ HINSTANCE, _In_opt_ HINSTANCE, _In_ LPSTR, _In_ int) {
 		front.world.x = position.x + forward.x * kBodyHalfLenght.x;
 		front.world.y = position.y + forward.y * kBodyHalfLenght.y;
 
-		if (preKeys[DIK_A]) {
-			if (x <= 0) {
+		if (keys[DIK_A]) {
+			x -= 0.0167f;
+			if (x < 0.0f) {
 				x = 0.0f;
 			}
-			x -= 0.0167f;
 		}
-		if (preKeys[DIK_D]) {
-			if (x >= 2) {
+		if (keys[DIK_D]) {
+			x += 0.0167f;
+			if (x > 2.0f) {
 				x = 2.0f;
 			}
-			x += 0.0167f;
 		}
 
 		ImGui::Begin("jump Ramp");
-		ImGui::DragFloat("x:%d", &x);
-
+		ImGui::SliderFloat("x", &x, 0.0f, 2.0f, "%.3f");
+		ImGui::Text("f'(x) : %.3f", slope);
+		ImGui::Text("forward : (%.3f, %.3f)", forward.x, forward.y);
 		ImGui::End();
 
 		///
